@@ -132,7 +132,7 @@ public class EmpleadoManager {
         String path = employeeFolder(code) + "/recibos.emp";
         RandomAccessFile recibo = new RandomAccessFile(path, "rw");
         RandomAccessFile ryear = salesFileFor(code);
-        
+
         int month = Calendar.getInstance().get(Calendar.MONTH);
         int year = Calendar.getInstance().get(Calendar.YEAR);
         long position = month * 9;
@@ -141,7 +141,7 @@ public class EmpleadoManager {
         boolean pagado = ryear.readBoolean();
         remps.seek(4);
         String nombre = remps.readUTF();
-        
+
         if (isEmployeeActive(code) && !pagado) {
             recibo.writeLong(Calendar.getInstance().getTimeInMillis());
             double comission = ventas * 0.10;
@@ -157,36 +157,52 @@ public class EmpleadoManager {
             System.out.println("Codigo: " + code + "Empleado: " + nombre + "Mes: " + month + "Sueldo Neto: " + sueldoNeto);
         }
     }
-    
+
     public void PrintEmployee(int code) throws IOException {
-        remps.seek(0);
-        while (remps.getFilePointer() < remps.length()) {
-            int codigo = remps.readInt();
-            String Nombre = remps.readUTF();
-            double salario = remps.readDouble();
-            Date date = new Date(remps.readLong());
-            SimpleDateFormat form = new SimpleDateFormat("dd-MM-yyyy");
-            String fechaForm = form.format(date);
-            long terminacion = remps.readLong();
-            String path = employeeFolder(code) + "/recibos.emp";
-            RandomAccessFile file = salesFileFor(code);
-            file.seek(0);
-            while (file.getFilePointer() < file.length()){
-                long FechaPago = file.readLong();
-                double comision = file.readDouble();
-                double sueldo = file.readDouble();
-                double deduccion = file.readDouble();
-                double neto = file.readDouble();
-                
-                
+        if (isEmployeeActive(code)) {
+            remps.seek(0);
+            while (remps.getFilePointer() < remps.length()) {
+                int codigo = remps.readInt();
+                String Nombre = remps.readUTF();
+                double salario = remps.readDouble();
+                Date date = new Date(remps.readLong());
+                SimpleDateFormat form = new SimpleDateFormat("dd-MM-yyyy");
+                String fechaForm = form.format(date);
+                long terminacion = remps.readLong();
+
+                if (codigo == code && terminacion == 0) {
+                    System.out.println("|Codigo : " + codigo + " | Nombre : " + Nombre + " | Salario : Lps." + salario + " | Fecha de ingreso: " + fechaForm + " |");
+                }
+
+                RandomAccessFile file = salesFileFor(code);
+                double ventaTotal = 0;
+                System.out.println("Ventas Anuales del Empleado:");
+                for (int mes = 0; mes < 12; mes++) {
+                    file.seek(mes * 9);
+                    double ventas = file.readDouble();
+                    boolean pagado = file.readBoolean();
+                    ventaTotal += ventas;
+                    System.out.println("Mes " + (mes + 1) + ": Ventas: Lps." + ventas + " | Pagado: " + pagado);
+                }
+                System.out.println("Total de Ventas del Año: Lps." + ventaTotal);
+
+                String path = employeeFolder(code) + "/recibos.emp";
+                RandomAccessFile pay = new RandomAccessFile(path, "rw");
+                file.seek(0);
+                while (file.getFilePointer() < file.length()) {
+                    long FechaPago = file.readLong();
+                    double comision = file.readDouble();
+                    double sueldo = file.readDouble();
+                    double deduccion = file.readDouble();
+                    double neto = file.readDouble();
+                    int año = file.readInt();
+                    int mes = file.readInt();
+                    System.out.println("Año: " + año + " | Mes: " + mes + " | Sueldo Neto: Lps." + neto + " | Comision: Lps." + comision + " | Deducción: Lps." + deduccion);
+                }
+                return;
             }
-            
-            
-            if (codigo == code && terminacion == 0) {
-                System.out.println("|Codigo : " + codigo + " | Nombre : " + Nombre + " | Salario : Lps." + salario + " | Fecha de ingreso: " + fechaForm + " |");
-            }
+            System.out.println("Empleado no existe!");
         }
-        System.out.println("Empleado no existe!");
     }
 
     public void Lista() throws IOException {
