@@ -127,7 +127,7 @@ public class EmpleadoManager {
             path.close();
         }
     }
-    
+
     public void payEmployee(int code) throws IOException {
         String path = employeeFolder(code) + "/recibos.emp";
         RandomAccessFile recibo = new RandomAccessFile(path, "rw");
@@ -172,35 +172,37 @@ public class EmpleadoManager {
 
                 if (codigo == code && terminacion == 0) {
                     System.out.println("|Codigo : " + codigo + " | Nombre : " + Nombre + " | Salario : Lps." + salario + " | Fecha de ingreso: " + fechaForm + " |");
-                }
+                    System.out.println("-------------------------------------------------------------------------------------------------");
+                    RandomAccessFile file = salesFileFor(code);
+                    double ventaTotal = 0;
+                    System.out.println("Ventas Anuales del Empleado:");
+                    for (int mes = 0; mes < 12; mes++) {
+                        file.seek(mes * 9);
+                        double ventas = file.readDouble();
+                        boolean pagado = file.readBoolean();
+                        ventaTotal += ventas;
+                        String pagado_r = pagado ? "Si" : "No";
+                        System.out.println("Mes " + (mes + 1) + ": Ventas: Lps." + ventas + " | Pagado: " + pagado_r);
+                    }
+                    System.out.println("----------------------------------------------------------------------------------------");
+                    System.out.println("Total de Ventas del Anio: Lps." + ventaTotal);
+                    System.out.println("-----------------------------------------------------------------------------------------");
+                    String path = employeeFolder(code) + "/recibos.emp";
+                    RandomAccessFile pay = new RandomAccessFile(path, "rw");
+                    file.seek(0);
 
-                RandomAccessFile file = salesFileFor(code);
-                double ventaTotal = 0;
-                System.out.println("Ventas Anuales del Empleado:");
-                for (int mes = 0; mes < 12; mes++) {
-                    file.seek(mes * 9);
-                    double ventas = file.readDouble();
-                    boolean pagado = file.readBoolean();
-                    ventaTotal += ventas;
-                    String pagado_r = pagado ? "Si" : "No";
-                    System.out.println("Mes " + (mes + 1) + ": Ventas: Lps." + ventas + " | Pagado: " + pagado_r);
+                    while (file.getFilePointer() < file.length()) {
+                        long FechaPago = file.readLong();
+                        double comision = file.readDouble();
+                        double sueldo = file.readDouble();
+                        double deduccion = file.readDouble();
+                        double neto = file.readDouble();
+                        int año = file.readInt();
+                        int mes = file.readInt();
+                        System.out.println("Anio: " + año + " | Mes: " + mes + " | Sueldo Neto: Lps." + neto + " | Comision: Lps." + comision + " | Deduccion: Lps." + deduccion);
+                    }
+                    return;
                 }
-                System.out.println("Total de Ventas del Anio: Lps." + ventaTotal);
-
-                String path = employeeFolder(code) + "/recibos.emp";
-                RandomAccessFile pay = new RandomAccessFile(path, "rw");
-                file.seek(0);
-                while (file.getFilePointer() < file.length()) {
-                    long FechaPago = file.readLong();
-                    double comision = file.readDouble();
-                    double sueldo = file.readDouble();
-                    double deduccion = file.readDouble();
-                    double neto = file.readDouble();
-                    int año = file.readInt();
-                    int mes = file.readInt();
-                    System.out.println("Anio: " + año + " | Mes: " + mes + " | Sueldo Neto: Lps." + neto + " | Comision: Lps." + comision + " | Deduccion: Lps." + deduccion);
-                }
-                return;
             }
             System.out.println("Empleado no existe!");
         }
