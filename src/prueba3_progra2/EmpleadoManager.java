@@ -182,9 +182,10 @@ public class EmpleadoManager {
                     double ventas = file.readDouble();
                     boolean pagado = file.readBoolean();
                     ventaTotal += ventas;
-                    System.out.println("Mes " + (mes + 1) + ": Ventas: Lps." + ventas + " | Pagado: " + pagado);
+                    String pagado_r = pagado ? "Si" : "No";
+                    System.out.println("Mes " + (mes + 1) + ": Ventas: Lps." + ventas + " | Pagado: " + pagado_r);
                 }
-                System.out.println("Total de Ventas del Año: Lps." + ventaTotal);
+                System.out.println("Total de Ventas del Anio: Lps." + ventaTotal);
 
                 String path = employeeFolder(code) + "/recibos.emp";
                 RandomAccessFile pay = new RandomAccessFile(path, "rw");
@@ -197,7 +198,7 @@ public class EmpleadoManager {
                     double neto = file.readDouble();
                     int año = file.readInt();
                     int mes = file.readInt();
-                    System.out.println("Año: " + año + " | Mes: " + mes + " | Sueldo Neto: Lps." + neto + " | Comision: Lps." + comision + " | Deducción: Lps." + deduccion);
+                    System.out.println("Anio: " + año + " | Mes: " + mes + " | Sueldo Neto: Lps." + neto + " | Comision: Lps." + comision + " | Deduccion: Lps." + deduccion);
                 }
                 return;
             }

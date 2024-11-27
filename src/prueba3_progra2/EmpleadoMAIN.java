@@ -31,7 +31,7 @@ public class EmpleadoMAIN {
             System.out.println("5.- Despedir al Empelado");
             System.out.println("6.- Mostrar informacion de un empleado");
             System.out.println("7.- Salir");
-            System.out.println("Escoja una opcion! (1,2,3,4,5 o 6)");
+            System.out.println("Escoja una opcion! (1,2,3,4,5,6 o 7)");
             try {
                 int opcion = scan.nextInt();
                 
@@ -86,7 +86,7 @@ public class EmpleadoMAIN {
             } catch (NullPointerException e) {
                 System.out.println(e.getMessage());
             } catch (IOException e) {
-                System.out.println("No se encontro el archivo : " + e.getMessage());
+                System.out.println(e.getMessage());
             }
 
         }
